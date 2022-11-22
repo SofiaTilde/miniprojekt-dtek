@@ -1,0 +1,18 @@
+/* Authors: Sofia Andersson, Sara Danielsson */
+/* Latest update: 21/11-22 */
+
+#include <stdio.h>
+#include "pic32mx.h"
+#include <DSPI.h>
+#include <PmodNAV.h>
+
+int main(void)
+{
+    
+}
+
+// init the SPI interface
+void begin(uint8_t prtSpi, uint8_t SSPinAG, uint8_t SSPinMAG, uint8_t SSPinALT, uint8_t DRDYPinMAG, int8_t INTPin)
+{
+
+}
