@@ -1,0 +1,6 @@
+mipslabmain.c.o: mipslabmain.c \
+ /Users/saradanielsson/IS1500HT22/miniprojekt-dtek/Mini_projekt/pic32/compiler/pic32-tools/pic32mx/include/stdint.h \
+ pic32mx.h mipslab.h
+mipslabmain.c :
+ /Users/saradanielsson/IS1500HT22/miniprojekt-dtek/Mini_projekt/pic32/compiler/pic32-tools/pic32mx/include/stdint.h :
+ pic32mx.h mipslab.h :
