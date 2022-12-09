@@ -1,0 +1,6 @@
+mipslabfunc.c.o: mipslabfunc.c \
+ /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h \
+ pic32mx.h mipslab.h mipslabdata.h
+mipslabfunc.c :
+ /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h :
+ pic32mx.h mipslab.h mipslabdata.h :

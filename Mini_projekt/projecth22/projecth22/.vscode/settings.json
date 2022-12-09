@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.png": "c",
+        "inttypes.h": "c",
+        "oledgrph.h": "c"
+    }
+}

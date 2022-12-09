@@ -1,0 +1,12 @@
+mipslabmain.c.o: mipslabmain.c \
+ /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h \
+ p32mx340f512h.h p32_defs.h inttypes.h stdint.h stddef.h stdbool.h \
+ mipslab.h mipslabdata.h \
+ /Applications/mcb32tools.app/Contents/Resources/Toolchain/include/pic32mx.h \
+ mipslabmain.h
+mipslabmain.c :
+ /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h :
+ p32mx340f512h.h p32_defs.h inttypes.h stdint.h stddef.h stdbool.h :
+ mipslab.h mipslabdata.h :
+ /Applications/mcb32tools.app/Contents/Resources/Toolchain/include/pic32mx.h :
+ mipslabmain.h :

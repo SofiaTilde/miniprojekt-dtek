@@ -1,0 +1,39 @@
+{
+    "env": {
+        "myDefaultIncludePath": [
+            "${workspaceFolder}",
+            "${workspaceFolder}/include"
+        ],
+        "myCompilerPath": "/usr/local/bin/gcc-7"
+    },
+    "configurations": [
+        {
+            "name": "Mac",
+            "intelliSenseMode": "clang-x64",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/Applications/mcb32tools.app/Contents/Resources/Toolchain/include/**",
+                "/Users/saradanielsson/Downloads/chipkit-core/pic32/cores/pic32/**",
+                "/Users/saradanielsson/Downloads/chipkit-core/pic32/variants/uC32/**",
+                "/Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/**"
+            ],
+            "macFrameworkPath": [
+                "/System/Library/Frameworks"
+            ],
+            "defines": [],
+            "forcedInclude": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "compileCommands": "",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}
