@@ -279,18 +279,18 @@ void debug_image(char toDebug[32][128])
 
 void testStuff()
 {
-    printf("Empty screen");
-    debug_image(Screen);
+    // printf("Empty screen");
+    // debug_image(Screen);
     addToScreen(LeftManualArrow);
-    printf("\nScreen with left manual arrow");
-    debug_image(Screen);
+    // printf("\nScreen with left manual arrow");
+    // debug_image(Screen);
     addToScreen(RightAutomaticArrow);
-    printf("\nScreen with left manual arrow and right automatic arrow");
-    debug_image(Screen);
+    // printf("\nScreen with left manual arrow and right automatic arrow");
+    // debug_image(Screen);
     update_screen();
-    clearScreen();
-    printf("\nEmpty screen");
-    debug_image(Screen);
+    // clearScreen();
+    // printf("\nEmpty screen");
+    // debug_image(Screen);
 }
 // translate into format render_image can understand
 void translate_image(char toTranslate[32][128])

@@ -235,20 +235,9 @@ void startI2C()
 
 int main(void)
 {
-	// initiate_spi();
-
-	// display_init();
-
-	// display_update();
-
-	// create_image(); // this creates the internal screen with demo data
-
-	// debug_inputimage(); // this debug prints the internal screen data unformatted
-
-	// translate_image(my_little_picture); // this translates internal screen to oled data
-	//  debug_outputimage();				// this prints debug of translate result
-
-	// render_image(picture);
+	initiate_spi();
+	display_init();
+	display_update();
 
 	// startI2C();
 
