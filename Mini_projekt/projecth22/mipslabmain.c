@@ -12,8 +12,9 @@
 #include <stdint.h>	 /* Declarations of uint_32 and the like */
 #include "pic32mx.h" /* Declarations of system-specific addresses etc */
 #include "mipslab.h" /* Declatations for these labs */
-//#include "mipslabdata.h" /* Drawing declarations */
+// #include "mipslabdata.h" /* Drawing declarations */
 #include "mipslabfunc.h"
+#include "mipslabfunc.c"
 #include "displayitems.c"
 
 // void translate_image(char[][]);
@@ -84,8 +85,6 @@ void debug_outputimage()
 	}
 	printf("\n)");
 } */
-
-// translate into format render_image can understand
 
 void initiate_spi()
 {
@@ -236,11 +235,11 @@ void startI2C()
 
 int main(void)
 {
-	initiate_spi();
+	// initiate_spi();
 
-	display_init();
+	// display_init();
 
-	display_update();
+	// display_update();
 
 	// create_image(); // this creates the internal screen with demo data
 
@@ -251,7 +250,7 @@ int main(void)
 
 	// render_image(picture);
 
-	startI2C();
+	// startI2C();
 
 	/*display_string(0, "KTH/ICT lab");
 	display_string(1, "in Computah");
@@ -262,10 +261,13 @@ int main(void)
 
 	// labinit(); Do any lab-specific initialization
 
-	while (1)
-	{
-		// labwork(); Do lab-specific things again and again
-	}
+	/*
+		while (1)
+		{
+			// labwork(); Do lab-specific things again and again
+		}
+	*/
 
+	testStuff();
 	return 0;
 }
