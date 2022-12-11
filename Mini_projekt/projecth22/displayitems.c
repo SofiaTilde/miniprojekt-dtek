@@ -15,12 +15,12 @@ volatile int *porte = (volatile int *)0xbf886110;
 
 enum ScreenType
 {
-    Main,
+    MainMenu,
     Bike,
     Sensitivity,
     Histogram
 };
-enum ScreenType CurrentScreen = Main;
+enum ScreenType CurrentScreen = MainMenu;
 
 char Screen[32][128] =
     {
@@ -511,10 +511,10 @@ int getbtns()
 
 void ChangeScreen(enum ScreenType ChangeTo)
 {
-    if (ChangeTo == Main)
+    if (ChangeTo == MainMenu)
     {
         clearScreen();
-        CurrentScreen = Main;
+        CurrentScreen = MainMenu;
         addToScreen(MainScreen);
     }
     else if (ChangeTo == Bike)
@@ -535,7 +535,7 @@ void ChangeScreen(enum ScreenType ChangeTo)
     }
     else
     {
-        ChangeScreen(Main);
+        ChangeScreen(MainMenu);
     }
 }
 
@@ -547,7 +547,7 @@ void doScreenStuff()
     int btn3 = (btns & 0b0100) >> 2;
     int btn4 = (btns & 0b1000) >> 3;
 
-    if (CurrentScreen == Main)
+    if (CurrentScreen == MainMenu)
     {
         if (btn1 == 1)
         {
@@ -602,7 +602,7 @@ void doScreenStuff()
         }
         if (btn1 == 1)
         {
-            ChangeScreen(Main);
+            ChangeScreen(MainMenu);
         }
     }
     else if (CurrentScreen == Sensitivity)
@@ -613,7 +613,7 @@ void doScreenStuff()
     }
     else
     {
-        ChangeScreen(Main);
+        ChangeScreen(MainMenu);
     }
 }
 
@@ -633,12 +633,15 @@ void testStuff()
     ChangeScreen(Histogram);
     printf("\nEmpty histogram");
     debug_image(Screen);
+    printf("\nHistogram, with bars");
     addHistogramBar(0, 10);
     addHistogramBar(1, 0);
     addHistogramBar(2, 1);
     addHistogramBar(3, 16);
     addHistogramBar(4, 20);
-    printf("\nHistogram, with bars");
+    debug_image(Screen);
+    printf("\nMainMenu");
+    ChangeScreen(MainMenu);
     debug_image(Screen);
 }
 
