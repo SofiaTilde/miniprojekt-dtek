@@ -1,0 +1,2 @@
+displayitems.c.o: displayitems.c pic32mx.h
+displayitems.c pic32mx.h :
