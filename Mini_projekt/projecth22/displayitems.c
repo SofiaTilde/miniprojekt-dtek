@@ -282,7 +282,7 @@ void clearScreen()
     }
 }
 
-void debug_image(char toDebug[32][128])
+/* void debug_image(char toDebug[32][128])
 {
     int i, j;
     printf("\n");
@@ -301,7 +301,7 @@ void debug_image(char toDebug[32][128])
         }
         printf("\n");
     }
-}
+} */
 
 void testStuff()
 {
@@ -554,6 +554,6 @@ void screen_init()
     IEC(0) += (1 << 11);
     IPC(2) += 0x1F000000;
 
-    enable_interrupt();
+    // enable_interrupt();
     return;
 }
