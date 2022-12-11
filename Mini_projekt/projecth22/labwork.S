@@ -20,7 +20,7 @@
   # Please add your own code below this line
   #
 timstr: .data
-.global delay, time2string
+.global delay, time2string, enable_interrupt
 .text
 
 hexasc:
@@ -69,6 +69,8 @@ delay:
  
  time2string:
  	PUSH $ra
+	PUSH $s0
+	PUSH $s1
  	
  	la $s0, ($a0)
  	add $s1, $a1, $0
@@ -105,12 +107,8 @@ delay:
 	add $t0,$0,0x00
 	sb $t0, 5($s0)
 	
+	POP $s1
+	POP $s0
  	POP $ra
  	jr $ra 
  	nop 	# delay slot filler (just in case)
- 	
-enable_interrupt:
-	ei
-	jr $ra
-	nop
-	

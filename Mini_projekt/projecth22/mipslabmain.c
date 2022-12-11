@@ -17,6 +17,7 @@
 //#include "mipslabfunc.c"
 //#include "displayitems.c"
 
+/*
 // void translate_image(char[][]);
 void render_image(char *data);
 char my_little_picture[32][128];
@@ -43,22 +44,22 @@ void create_image()
 			my_little_picture[i][j] = (char)1;
 		}
 	} */
-
-	// add a little ball
-	my_little_picture[0][0] = 1;
-	my_little_picture[1][0] = 1;
-	my_little_picture[2][0] = 1;
-	my_little_picture[3][0] = 1;
-	my_little_picture[4][0] = 1;
-	my_little_picture[5][0] = 1;
-	my_little_picture[6][0] = 1;
-	my_little_picture[7][0] = 1;
-	/* my_little_picture[11][99] = 0;
-	my_little_picture[11][100] = 0;
-	my_little_picture[11][101] = 0;
-	my_little_picture[12][100] = 0; */
-}
-
+/*
+// add a little ball
+my_little_picture[0][0] = 1;
+my_little_picture[1][0] = 1;
+my_little_picture[2][0] = 1;
+my_little_picture[3][0] = 1;
+my_little_picture[4][0] = 1;
+my_little_picture[5][0] = 1;
+my_little_picture[6][0] = 1;
+my_little_picture[7][0] = 1;
+* /
+/* my_little_picture[11][99] = 0;
+my_little_picture[11][100] = 0;
+my_little_picture[11][101] = 0;
+my_little_picture[12][100] = 0; */
+//}
 /* void debug_inputimage()
 {
 	int i, j;
@@ -244,6 +245,8 @@ int main(void)
 	// startI2C();
 	// testStuff();
 	//*
+	ChangeScreen();
+	update_screen();
 	while (1)
 	{
 		doScreenStuff();
