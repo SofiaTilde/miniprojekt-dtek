@@ -14,8 +14,8 @@
 #include "mipslab.h" /* Declatations for these labs */
 // #include "mipslabdata.h" /* Drawing declarations */
 #include "mipslabfunc.h"
-//#include "mipslabfunc.c"
-//#include "displayitems.c"
+// #include "mipslabfunc.c"
+#include "displayitems.c"
 
 /*
 // void translate_image(char[][]);
@@ -162,89 +162,90 @@ void isAcknowledged()
 		toCheck &= 0x0001;
 	}
 }
-
+/*
 void startI2C()
 {
-	/* Set up I2C as master */
-	I2C1CONSET = 1 << 15; // start condition
-	I2C1CONSET = 1 << 0;
-	I2C1STATSET = 1 << 3;
+	//Set up I2C as master
+I2C1CONSET = 1 << 15; // start condition
+I2C1CONSET = 1 << 0;
+I2C1STATSET = 1 << 3;
 
-	/*
-	SCL -> J11 SCL -> 19/A5 -> RB14
-	SDA -> J11 SDA -> 18/A4 -> RB12
-	*/
-	// check if bus is idle
-	/*
-	int returnvalue = PORTG;
-	returnvalue &= 0b 0001 0000;
-	returnvalue = returnvalue >> 4;
-	if (returnvalue ==)
-	*/
-	/*
-	// start condition
-	setSCL(1);
-	setSDA(1);
-	setSDA(0);
-	setSCL(0);
-	*/
-	// 0001 1101
-	// 0011101
-	int slave_address = 0b00111010; // 8 bit slave address
-	slave_address |= 0 << 0;		// setting last bit to write (0)
-	I2C1TRNSET = slave_address;		// slave address with write bit
-	// I2C1STATSET = 0 << 2;  // setting bit to write
-	// I2C1ADDSET = 0011101;  // setting the slave address
-	isAcknowledged();
-	display_string(0, "Acknowledged!!!!!");
-	display_update();
+/*
+SCL -> J11 SCL -> 19/A5 -> RB14
+SDA -> J11 SDA -> 18/A4 -> RB12
+*/
+// check if bus is idle
+/*
+int returnvalue = PORTG;
+returnvalue &= 0b 0001 0000;
+returnvalue = returnvalue >> 4;
+if (returnvalue ==)
+*/
+/*
+// start condition
+setSCL(1);
+setSDA(1);
+setSDA(0);
+setSCL(0);
+*/
+// 0001 1101
+// 0011101
+/*
+int slave_address = 0b00111010; // 8 bit slave address
+slave_address |= 0 << 0;		// setting last bit to write (0)
+I2C1TRNSET = slave_address;		// slave address with write bit
+// I2C1STATSET = 0 << 2;  // setting bit to write
+// I2C1ADDSET = 0011101;  // setting the slave address
+isAcknowledged();
+display_string(0, "Acknowledged!!!!!");
+display_update();
 
-	I2C1TRNSET = 0b00000000;
-	isAcknowledged();
-	display_string(1, "Acknowledged!!!!!");
-	display_update();
+I2C1TRNSET = 0b00000000;
+isAcknowledged();
+display_string(1, "Acknowledged!!!!!");
+display_update();
 
-	I2C1TRNSET = 0x0F;
-	isAcknowledged();
-	display_string(2, "Acknowledged!!!!!");
-	display_update();
+I2C1TRNSET = 0x0F;
+isAcknowledged();
+display_string(2, "Acknowledged!!!!!");
+display_update();
 
-	I2C1CONSET = 1 << 1;
+I2C1CONSET = 1 << 1;
 
-	slave_address |= 1 << 0;	// setting last bit to read (1)
-	I2C1TRNSET = slave_address; // slave address with read bit
-	isAcknowledged();
+slave_address |= 1 << 0;	// setting last bit to read (1)
+I2C1TRNSET = slave_address; // slave address with read bit
+isAcknowledged();
 
-	I2C1CONSET = 1 << 3;
-	I2C1CONSET = 1 << 5; // sends a NACK
-	I2C1CONSET = 1 << 2; // stop
+I2C1CONSET = 1 << 3;
+I2C1CONSET = 1 << 5; // sends a NACK
+I2C1CONSET = 1 << 2; // stop
 
-	// display_debug(&I2C1RCV);
-	if (I2C1RCV == 0) // 0xD4)
-	{
-		display_string(3, "00000000");
-		display_update();
-	}
-	else if (I2C1RCV == 0xD4)
-	{
-		display_string(3, "11010100");
-		display_update();
-	}
-	display_string(0, "Is here");
+// display_debug(&I2C1RCV);
+if (I2C1RCV == 0) // 0xD4)
+{
+	display_string(3, "00000000");
 	display_update();
 }
-
+else if (I2C1RCV == 0xD4)
+{
+	display_string(3, "11010100");
+	display_update();
+}
+display_string(0, "Is here");
+display_update();
+}
+*/
 int main(void)
 {
-	//*
+	/*
 	initiate_spi();
 	display_init();
 	display_update();
 	screen_init();
 	//*/
 	// startI2C();
-	// testStuff();
-	//*
+	testStuff();
+	/*
 	ChangeScreen();
 	update_screen();
 	while (1)
