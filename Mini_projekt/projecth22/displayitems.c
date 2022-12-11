@@ -816,6 +816,7 @@ void addXYZPlace(int place, char numbers[17])
     }
 }
 
+/*
 void debug_image(char toDebug[32][128])
 {
     int i, j;
@@ -1067,6 +1068,7 @@ void doScreenStuff()
     }
 }
 
+/*
 void testStuff()
 {
     printf("Empty screen");
@@ -1082,7 +1084,7 @@ void testStuff()
     debug_image(Screen);
 }
 //*/
-/*
+
 void screen_init()
 {
     // mask

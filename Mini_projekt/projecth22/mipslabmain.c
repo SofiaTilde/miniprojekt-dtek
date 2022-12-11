@@ -15,7 +15,7 @@
 // #include "mipslabdata.h" /* Drawing declarations */
 #include "mipslabfunc.h"
 // #include "mipslabfunc.c"
-#include "displayitems.c"
+// #include "displayitems.c"
 
 /*
 // void translate_image(char[][]);
