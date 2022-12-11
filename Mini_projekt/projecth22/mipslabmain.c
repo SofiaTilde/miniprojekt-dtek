@@ -237,15 +237,15 @@ display_update();
 */
 int main(void)
 {
-	/*
+
 	initiate_spi();
 	display_init();
 	display_update();
 	screen_init();
 	//*/
 	// startI2C();
-	testStuff();
-	/*
+	// testStuff();
+
 	ChangeScreen();
 	update_screen();
 	while (1)
