@@ -394,9 +394,6 @@ void clearScreen()
     }
 }
 
-<<<<<<< HEAD
-/* void debug_image(char toDebug[32][128])
-=======
 void addHistogramBar(int place, int num)
 {
     /*
@@ -439,7 +436,6 @@ void addHistogramBar(int place, int num)
 }
 
 void debug_image(char toDebug[32][128])
->>>>>>> 52bccdaeed6aa1d11eb3f29f5074a4ff4475f735
 {
     int i, j;
     printf("\n");
@@ -458,10 +454,11 @@ void debug_image(char toDebug[32][128])
         }
         printf("\n");
     }
-} */
+}
+* /
 
-// translate into format render_image can understand
-void translate_image(char toTranslate[32][128])
+    // translate into format render_image can understand
+    void translate_image(char toTranslate[32][128])
 {
     // init loop values
     int i, j, k;
