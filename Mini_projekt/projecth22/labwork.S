@@ -109,3 +109,8 @@ delay:
  	jr $ra 
  	nop 	# delay slot filler (just in case)
  	
+enable_interrupt:
+	ei
+	jr $ra
+	nop
+	

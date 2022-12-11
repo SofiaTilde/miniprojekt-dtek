@@ -1,5 +1,17 @@
+#include "pic32mx.h" /* Declarations of system-specific addresses etc */
+
 void render_image(char *data);
 void translate_image(char toTranslate[32][128]);
+extern void enable_interrupt();
+
+// setting timer period
+#define TMR2PERIOD ((80000000 / 256) / 10)
+// catch too large period
+#if TMR2PERIOD > 0xffff
+#error "Timer period is too big."
+#endif
+
+volatile int *porte = (volatile int *)0xbf886110;
 
 char Screen[32][128] =
     {
@@ -36,7 +48,8 @@ char Screen[32][128] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 char DrawingScreen[4 * 128] =
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 char LeftAutomaticArrow[32][128] =
     {
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -208,6 +221,19 @@ char BrakeLight[32][128] =
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
+int ToggleActiveLeftAutomaticArrow = 0;
+int ToggleActiveRightAutomaticArrow = 0;
+int ToggleActiveLeftManualArrow = 0;
+int ToggleActiveRightManualArrow = 0;
+
+int ActiveLeftAutomaticArrow = 0;
+int ActiveRightAutomaticArrow = 0;
+int ActiveLeftManualArrow = 0;
+int ActiveRightManualArrow = 0;
+int ActiveBrakeLight = 0;
+
+int timeoutcount = 0;
+
 void addToScreen(char toAdd[32][128])
 {
     int i, j;
@@ -347,4 +373,187 @@ void translate_image(char toTranslate[32][128])
             placement_index++;
         }
     }
+}
+
+int getsw()
+{
+    int returnValue = PORTD;
+    //               4321
+    returnValue &= 0b111100000000;
+    returnValue = returnValue >> 8;
+
+    // returning status on SW1-SW4
+    // return is 4321
+    return returnValue;
+}
+
+int getbtns()
+{
+    int returnValue = PORTD;
+    // btns          432
+    returnValue &= 0b11100000;
+    returnValue = returnValue >> 5;
+
+    int btn1 = PORTF;
+    // btn    1
+    btn1 &= 0b10;
+    btn1 = btn1 >> 1;
+
+    // returning status on B1-B4
+    // return is 4321
+    returnValue == returnValue << 1;
+    returnValue += btn1;
+    return returnValue;
+}
+
+void doScreenStuff()
+{
+    int btns = getbtns();
+    // int btn1 = btns & 0b0001;
+    int btn2 = (btns & 0b0010) >> 1;
+    int btn3 = (btns & 0b0100) >> 2;
+    int btn4 = (btns & 0b1000) >> 3;
+    if (btn4 == 1)
+    {
+        if (ToggleActiveLeftManualArrow == 1)
+        {
+            ToggleActiveLeftManualArrow = 0;
+        }
+        else
+        {
+            ToggleActiveLeftManualArrow = 1;
+        }
+    }
+    if (btn3 == 1)
+    {
+        if (ToggleActiveRightManualArrow == 1)
+        {
+            ToggleActiveRightManualArrow = 0;
+        }
+        else
+        {
+            ToggleActiveRightManualArrow = 1;
+        }
+    }
+    if (btn2 == 1)
+    {
+        if (ActiveBrakeLight == 1)
+        {
+            ActiveBrakeLight = 0;
+            removeFromScreen(BrakeLight);
+        }
+        else
+        {
+            ActiveBrakeLight = 1;
+            addToScreen(BrakeLight);
+        }
+        update_screen();
+    }
+}
+
+/* Interrupt Service Routine */
+void user_isr(void)
+{
+    // checking if bit 8 indicates flag
+    if ((IFS(0) & 0x00000100) != 0)
+    {
+        // set interrupt flag to 0
+        // IFS(0) = 0;
+        IFS(0) = IFS(0) & 0xFFFFFEFF;
+
+        timeoutcount += 1;
+
+        if (timeoutcount >= 10)
+        {
+            timeoutcount = 0;
+
+            if (ToggleActiveLeftManualArrow == 1)
+            {
+                if (ActiveLeftManualArrow == 1)
+                {
+                    removeFromScreen(LeftManualArrow);
+                }
+                else
+                {
+                    addToScreen(LeftManualArrow);
+                }
+            }
+            if (ToggleActiveRightManualArrow == 1)
+            {
+                if (ActiveRightManualArrow == 1)
+                {
+                    removeFromScreen(RightManualArrow);
+                }
+                else
+                {
+                    addToScreen(RightManualArrow);
+                }
+            }
+
+            if (ToggleActiveLeftAutomaticArrow == 1)
+            {
+                if (ActiveLeftAutomaticArrow == 1)
+                {
+                    removeFromScreen(LeftAutomaticArrow);
+                }
+                else
+                {
+                    addToScreen(LeftAutomaticArrow);
+                }
+            }
+            if (ToggleActiveRightAutomaticArrow == 1)
+            {
+                if (ActiveRightAutomaticArrow == 1)
+                {
+                    removeFromScreen(RightAutomaticArrow);
+                }
+                else
+                {
+                    addToScreen(RightAutomaticArrow);
+                }
+            }
+
+            update_screen();
+        }
+    }
+}
+
+void screen_init()
+{
+    // mask
+    TRISD &= 0b000000011111;
+    TRISF &= 0b111111111101;
+    // set to input
+    TRISD += 0b111111100000;
+    TRISF += 0b000000000010;
+
+    // initializing volatile pointer to TRISE
+    volatile int *trise = (volatile int *)0xbf886100;
+
+    // setting lowest 8 bits to output
+    *trise &= 0x00;
+
+    // set intial value to 0
+    *porte = 0;
+
+    // setting prescale to 1:256
+    T2CON = 0x70;
+    // init timer
+    PR2 = TMR2PERIOD;
+
+    // setting timer
+    TMR2 = 0;
+
+    // setting the on bit (bit 15) to 1 to start the timer
+    T2CONSET = 0x8000;
+    // enable interrupts globally
+    IEC(0) = (1 << 8);
+    // enable interrupts from Timer 2
+    IPC(2) = 4;
+    // init external interrupt for INT2
+    IEC(0) += (1 << 11);
+    IPC(2) += 0x1F000000;
+
+    enable_interrupt();
+    return;
 }

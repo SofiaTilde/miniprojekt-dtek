@@ -235,28 +235,18 @@ void startI2C()
 
 int main(void)
 {
+
 	initiate_spi();
 	display_init();
 	display_update();
+	screen_init();
 
 	// startI2C();
-
-	/*display_string(0, "KTH/ICT lab");
-	display_string(1, "in Computah");
-	display_string(2, "Engineering");
-	display_string(3, "Welcome!");*/
-
-	// display_image(96, icon);
-
-	// labinit(); Do any lab-specific initialization
-
-	/*
-		while (1)
-		{
-			// labwork(); Do lab-specific things again and again
-		}
-	*/
-
 	testStuff();
+	while (1)
+	{
+		doScreenStuff();
+	}
+
 	return 0;
 }
