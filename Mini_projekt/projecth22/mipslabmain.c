@@ -16,21 +16,69 @@
 //#include "mipslabdata.h" /* Drawing declarations */
 #include "mipslabfunc.h"
 #include "displayitems.c"
-//#include "LSM9DS0.h" /* Register defs */
 
-// doc: LSM9DS0 9-axis IMU (0x1D or 0x1E for Accel/Mag, 0x6A or 0x6B for gyro)
-#define ACCELEROMETER_ADDR 0x1E
-#define OUT_X_L_A 0x28
-#define OUT_X_H_A 0x29
-#define OUT_Y_L_A 0x2A
-#define OUT_Y_H_A 0x2B
-#define OUT_Z_L_A 0x2C
-#define OUT_Z_H_A 0x2D
-#define WHO_AM_I_XM 0x0F
-#define CTRL_REG0_XM 0x1F
-#define CTRL_REG1_XM 0x20
-#define CTRL_REG2_XM 0x21
-#define FIFO_CTRL_REG 0x2E // bypass mode
+/////////////////////////////////////////
+// LSM9DS1 Accel/Gyro (XL/G) Registers //
+/////////////////////////////////////////
+#define ACCELEROMETER_ADDR 0x6B
+#define ACT_THS 0x04
+#define ACT_DUR 0x05
+#define INT_GEN_CFG_XL 0x06
+#define INT_GEN_THS_X_XL 0x07
+#define INT_GEN_THS_Y_XL 0x08
+#define INT_GEN_THS_Z_XL 0x09
+#define INT_GEN_DUR_XL 0x0A
+#define REFERENCE_G 0x0B
+#define INT1_CTRL 0x0C
+#define INT2_CTRL 0x0D
+#define WHO_AM_I_XG 0x0F
+#define CTRL_REG1_G 0x10
+#define CTRL_REG2_G 0x11
+#define CTRL_REG3_G 0x12
+#define ORIENT_CFG_G 0x13
+#define INT_GEN_SRC_G 0x14
+#define OUT_TEMP_L 0x15
+#define OUT_TEMP_H 0x16
+#define STATUS_REG_0 0x17
+#define OUT_X_L_G 0x18
+#define OUT_X_H_G 0x19
+#define OUT_Y_L_G 0x1A
+#define OUT_Y_H_G 0x1B
+#define OUT_Z_L_G 0x1C
+#define OUT_Z_H_G 0x1D
+#define CTRL_REG4 0x1E
+#define CTRL_REG5_XL 0x1F
+#define CTRL_REG6_XL 0x20
+#define CTRL_REG7_XL 0x21
+#define CTRL_REG8 0x22
+#define CTRL_REG9 0x23
+#define CTRL_REG10 0x24
+#define INT_GEN_SRC_XL 0x26
+#define STATUS_REG_1 0x27
+#define OUT_X_L_XL 0x28
+#define OUT_X_H_XL 0x29
+#define OUT_Y_L_XL 0x2A
+#define OUT_Y_H_XL 0x2B
+#define OUT_Z_L_XL 0x2C
+#define OUT_Z_H_XL 0x2D
+#define FIFO_CTRL 0x2E
+#define FIFO_SRC 0x2F
+#define INT_GEN_CFG_G 0x30
+#define INT_GEN_THS_XH_G 0x31
+#define INT_GEN_THS_XL_G 0x32
+#define INT_GEN_THS_YH_G 0x33
+#define INT_GEN_THS_YL_G 0x34
+#define INT_GEN_THS_ZH_G 0x35
+#define INT_GEN_THS_ZL_G 0x36
+#define INT_GEN_DUR_G 0x37
+
+/* Global variables */
+// declare array to hold the high and low 8 bits (total 16 bits) for X, Y and Z.
+uint8_t accel_data[6];
+// variables to hold the full X, Y and Z results.
+uint16_t x_data;
+uint16_t y_data;
+uint16_t z_data;
 
 void initiate_spi()
 {
@@ -78,37 +126,6 @@ is running at 80 MHz. Changed 2017, as recommended by Axel.
 	/* SPI2CON bit ON = 1; */
 	SPI2CONSET = 0x8000;
 }
-
-/* void clockTick() //!!!! TODO FIX
-{
-	int i;
-	for (i = 0; i > 500; i++)
-	{
-	}
-}
-void setSCL(int num)
-{
-	clockTick();
-	// PORTBSET = num << 12;
-	PORTB = num << 12;
-}
-void setSDA(int num)
-{
-	clockTick();
-	// PORTBSET = num << 14;
-	PORTB = num << 14;
-}
-void isAcknowledged()
-{
-	//(I2CxSTAT<15>)
-	int toCheck = 1;
-	while (toCheck != 0)
-	{
-		toCheck = I2C1STAT;
-		toCheck = toCheck >> 15;
-		toCheck &= 0x0001;
-	}
-} */
 
 void check_if_idle()
 {
@@ -185,8 +202,9 @@ void stop_I2C()
 	check_if_idle();
 }
 
-void getACCLX_I2C()
+void getACCL_XYZ_I2C()
 {
+
 	do
 	{
 		start_I2C();
@@ -194,7 +212,7 @@ void getACCLX_I2C()
 	} while (!send_I2C(ACCELEROMETER_ADDR << 1));
 
 	// send register address
-	send_I2C(OUT_X_L_A);
+	send_I2C(OUT_X_L_XL);
 
 	// send slave address with read bit
 	do
@@ -203,8 +221,16 @@ void getACCLX_I2C()
 
 	} while (!send_I2C((ACCELEROMETER_ADDR << 1) | 1));
 
-	// recv data from slave
-	uint8_t mydata = recv_I2C();
+	// recv data
+	int j;
+	for (j = 0; j < 5; j++)
+	{
+		accel_data[j] = recv_I2C(); // grab 8 bits of data at a time
+		ACK_I2C();					// sends master ACK to confirm more data can be sent
+	}
+
+	// recv last 8 bits outside of loop to send Nack instead of mack after
+	accel_data[5] = recv_I2C();
 
 	// send NACK
 	NACK_I2C();
@@ -212,8 +238,32 @@ void getACCLX_I2C()
 	// send stop
 	stop_I2C();
 
-	// print the value from uint8_t to char array
-	char thebits[9] = {'0', '0', '0', '0', '0', '0', '0', '0', '\0'};
+	// formatting high and low bits for each value to one complete X, Y and Z result
+	x_data = (accel_data[1] << 8) | accel_data[0];
+	y_data = (accel_data[3] << 8) | accel_data[2];
+	z_data = (accel_data[5] << 8) | accel_data[4];
+
+	// print the value from uint16_t to char array
+	char xyz_data;
+	char thebits[17] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '\0'};
+	int s;
+	for (s = 0; s < 3; s++)
+	{
+
+		int i;
+		int onebit;
+		for (i = 0; i < 16; i++)
+		{
+			// uint8_t onebit = mydata & 1;
+			// onebit = (mydata & (1 << (7 - i)));
+			if (mydata & (1 << (15 - i)))
+			{
+				thebits[i] = '1';
+			}
+		}
+	}
+
+	/* char thebits[9] = {'0', '0', '0', '0', '0', '0', '0', '0', '\0'};
 	int i;
 	int onebit;
 	for (i = 0; i < 8; i++)
@@ -224,7 +274,7 @@ void getACCLX_I2C()
 		{
 			thebits[i] = '1';
 		}
-	}
+	} */
 	display_string(1, thebits);
 	display_update();
 }
@@ -280,39 +330,30 @@ void getWHOAMI()
 	display_update();
 }
 
-void ACCEL_config()
+void ACCEL_config_I2C()
 {
 	do
 	{
 		start_I2C();
-	} while (send_I2C((ACCELEROMETER_ADDR << 1)) != 1);
-	send_I2C(CTRL_REG0_XM);
+	} while (!send_I2C((ACCELEROMETER_ADDR << 1)));
+	send_I2C(CTRL_REG5_XL);
+	send_I2C(0x38);
+	stop_I2C();
+
+	do
+	{
+		start_I2C();
+	} while (!send_I2C((ACCELEROMETER_ADDR << 1)));
+	send_I2C(CTRL_REG6_XL);
+	send_I2C(0x78);
+	stop_I2C();
+
+	do
+	{
+		start_I2C();
+	} while (!send_I2C((ACCELEROMETER_ADDR << 1)));
+	send_I2C(CTRL_REG7_XL);
 	send_I2C(0x00);
-	stop_I2C();
-
-	do
-	{
-		start_I2C();
-	} while (send_I2C((ACCELEROMETER_ADDR << 1)) != 1);
-	send_I2C(CTRL_REG1_XM);
-	send_I2C(0x67);
-	stop_I2C();
-
-	do
-	{
-		start_I2C();
-	} while (send_I2C((ACCELEROMETER_ADDR << 1)) != 1);
-	send_I2C(CTRL_REG2_XM);
-	send_I2C(0x20); // setup how many g's (2 g)
-	stop_I2C();
-
-	// setup bypass mode
-	do
-	{
-		start_I2C();
-	} while (send_I2C((ACCELEROMETER_ADDR << 1)) != 1);
-	send_I2C(FIFO_CTRL_REG);
-	send_I2C(0x4); // setup how many g's (2 g)
 	stop_I2C();
 }
 
@@ -331,7 +372,7 @@ int main(void)
 	TRISFSET = 1 << 1;
 
 	// acceletometer configurations setup
-	ACCEL_config();
+	ACCEL_config_I2C();
 
 	// start reading accl data
 	// Send start to intialize I2C message
@@ -341,7 +382,7 @@ int main(void)
 
 	while (1)
 	{
-		getACCLX_I2C();
+		getACCL_XYZ_I2C();
 		delay_I2C();
 	}
 
