@@ -20,7 +20,7 @@ mipslabmain.c.o: mipslabmain.c \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/machine/stdlib.h \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/alloca.h \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h \
- pic32mx.h mipslab.h mipslabfunc.h
+ pic32mx.h mipslab.h mipslabfunc.h displayitems.c LSM9DS0.h
 mipslabmain.c :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdio.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/_ansi.h :
@@ -43,4 +43,4 @@ mipslabmain.c :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/machine/stdlib.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/alloca.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h :
- pic32mx.h mipslab.h mipslabfunc.h :
+ pic32mx.h mipslab.h mipslabfunc.h displayitems.c LSM9DS0.h :

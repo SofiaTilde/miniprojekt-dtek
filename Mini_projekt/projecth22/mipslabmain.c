@@ -15,18 +15,19 @@
 //#include "mipslabdata.h" /* Drawing declarations */
 #include "mipslabfunc.h"
 #include "displayitems.c"
+#include "LSM9DS0.h" /* Register defs */
 
 // void translate_image(char[][]);
 void render_image(char *data);
-char my_little_picture[32][128];
+// char my_little_picture[32][128];
 
 // array to put results in
-char picture[4 * 128] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+// char picture[4 * 128] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // create image here to send to translate image
-void create_image()
+/*void create_image()
 {
-	/* int i, j;
+	int i, j;
 	for (i = 0; i < 32; i++)
 	{
 		for (j = 0; j < 128; j + 2)
@@ -41,7 +42,7 @@ void create_image()
 		{
 			my_little_picture[i][j] = (char)1;
 		}
-	} */
+	}
 
 	// add a little ball
 	my_little_picture[0][0] = 1;
@@ -52,11 +53,11 @@ void create_image()
 	my_little_picture[5][0] = 1;
 	my_little_picture[6][0] = 1;
 	my_little_picture[7][0] = 1;
-	/* my_little_picture[11][99] = 0;
+	my_little_picture[11][99] = 0;
 	my_little_picture[11][100] = 0;
 	my_little_picture[11][101] = 0;
-	my_little_picture[12][100] = 0; */
-}
+	my_little_picture[12][100] = 0;
+} */
 
 /* void debug_inputimage()
 {
@@ -144,12 +145,14 @@ void clockTick() //!!!! TODO FIX
 void setSCL(int num)
 {
 	clockTick();
-	PORTBSET = num << 12;
+	// PORTBSET = num << 12;
+	PORTB = num << 12;
 }
 void setSDA(int num)
 {
 	clockTick();
-	PORTBSET = num << 14;
+	// PORTBSET = num << 14;
+	PORTB = num << 14;
 }
 void isAcknowledged()
 {
@@ -163,75 +166,122 @@ void isAcknowledged()
 	}
 }
 
+void check_if_idle()
+{
+	// Check lowest 5 bits of I2C1CON to check if idle
+	// Check bit 14 of I2CSTAT to make sure no master transmit is in progress
+	// if both or one is 1 keep waiting to finish
+	// if both are 0 then proceed
+	while ((I2C1CON & 0x1F) || (I2C1STAT & (1 << 14)))
+		;
+}
+
+int check_if_acknowledged()
+{
+	// check if slave acknowledged
+	while (!(I2C1STAT & (1 << 15)))
+		; // ACKSTAT: acknowledge status
+	return 1;
+}
+
+// send i2c
+int send(uint8_t tobBeSent)
+{
+	check_if_idle();
+	I2C1TRN = tobBeSent;
+	check_if_idle();
+	// return status of ack
+	return (!(I2C1STAT & (1 << 15)));
+}
+
 void startI2C()
 {
-	/* Set up I2C as master */
-	I2C1CONSET = 1 << 15; // start condition
-	I2C1CONSET = 1 << 0;
-	I2C1STATSET = 1 << 3;
+	display_string(0, "hello1");
+	/* Set up I2C as master and clean before begin */
+	I2C1CON = 0;				 // clean-up
+	I2C1STAT = 0;				 // clean-up
+	I2C1BRG = 0x184;			 // setting BRG to recommended 100 kHz clock frequency for 80 MHz CPU
+	I2C1CONSET = 1 << 13;		 // SIDL: Stop module operation when idle
+	I2C1CONSET = 1 << 15;		 // ON: start condition
+	uint8_t gyro_data = I2C1RCV; // Clean recieve data before using
+	display_string(1, "hello2");
 
-	/*
-	SCL -> J11 SCL -> 19/A5 -> RB14
-	SDA -> J11 SDA -> 18/A4 -> RB12
-	*/
-	// check if bus is idle
-	/*
-	int returnvalue = PORTG;
-	returnvalue &= 0b 0001 0000;
-	returnvalue = returnvalue >> 4;
-	if (returnvalue ==)
-	*/
-	/*
-	// start condition
-	setSCL(1);
-	setSDA(1);
-	setSDA(0);
-	setSCL(0);
-	*/
-	// 0001 1101
-	// 0011101
-	int slave_address = 0b00111010; // 8 bit slave address
-	slave_address |= 0 << 0;		// setting last bit to write (0)
-	I2C1TRNSET = slave_address;		// slave address with write bit
-	// I2C1STATSET = 0 << 2;  // setting bit to write
-	// I2C1ADDSET = 0011101;  // setting the slave address
-	isAcknowledged();
-	display_string(0, "Acknowledged!!!!!");
-	display_update();
+	// Set up input pins
+	TRISDSET = 1 << 8;
+	TRISFSET = 1 << 1;
+	display_string(2, "hello3");
 
-	I2C1TRNSET = 0b00000000;
-	isAcknowledged();
-	display_string(1, "Acknowledged!!!!!");
-	display_update();
+	// Send start to intialize I2C message
+	// first check if idle before doing anything
+	check_if_idle();
+	I2C1CONSET = 1 << 0; // SEN: start condition enable bit
+	check_if_idle();
+	display_string(3, "hello4");
 
-	I2C1TRNSET = 0x0F;
-	isAcknowledged();
-	display_string(2, "Acknowledged!!!!!");
-	display_update();
-
-	I2C1CONSET = 1 << 1;
-
-	slave_address |= 1 << 0;	// setting last bit to read (1)
-	I2C1TRNSET = slave_address; // slave address with read bit
-	isAcknowledged();
-
-	I2C1CONSET = 1 << 3;
-	I2C1CONSET = 1 << 5; // sends a NACK
-	I2C1CONSET = 1 << 2; // stop
-
-	// display_debug(&I2C1RCV);
-	if (I2C1RCV == 0) // 0xD4)
+	// send slave address with write bit
+	I2C1TRN = (ACCELEROMETER_ADDR << 1); // TRN: transmit accelerometer address onto I2C bus
+	check_if_idle();
+	while (check_if_acknowledged() != 1)
 	{
-		display_string(3, "00000000");
-		display_update();
+		I2C1TRN = (ACCELEROMETER_ADDR << 1);
 	}
-	else if (I2C1RCV == 0xD4)
+
+	// send register address
+	check_if_idle();
+	I2C1TRN = WHO_AM_I_XM; // send register
+	check_if_idle();
+	while (check_if_acknowledged() != 1)
 	{
-		display_string(3, "11010100");
-		display_update();
+		I2C1TRN = WHO_AM_I_XM;
 	}
-	display_string(0, "Is here");
-	display_update();
+
+	// send restart condition
+	check_if_idle();
+	I2C1CONSET = 1 << 1; // set restart condition
+	check_if_idle();
+
+	// send slave address with read bit
+	I2C1TRN = ((ACCELEROMETER_ADDR << 1) | 1); // TRN: transmit accelerometer address onto I2C bus
+	check_if_idle();
+	while (check_if_acknowledged() != 1)
+	{
+		I2C1TRN = ((ACCELEROMETER_ADDR << 1) | 1);
+	}
+
+	// recv data from slave
+	check_if_idle();
+	I2C1CONSET = 1 << 3; // enable recv
+	check_if_idle();
+	I2C1STATCLR = 1 << 6; // set bit 6 to 0
+	uint8_t mydata = I2C1RCV;
+
+	// send NACK
+	I2C1CON = 1 << 5; // ACKDT
+	// stop
+	I2C1CON = 1 << 2;
+
+	// print the value from uint8_t to char array
+	char thebits[8];
+	int i;
+	for (i = 0; i < 7; i++)
+	{
+		uint8_t onebit = mydata & 1;
+		if (onebit == (uint8_t)1)
+		{
+			thebits[i] = 1;
+		}
+		else
+		{
+			thebits[i] = 0;
+		}
+	}
+
+	display_string(1, "hello_world");
+	display_string(0, thebits);
+	display_update;
+
+	// SCL -> J11 SCL -> 19/A5 -> RB14
+	// SDA -> J11 SDA -> 18/A4 -> RB12
 }
 
 int main(void)
@@ -239,6 +289,8 @@ int main(void)
 	initiate_spi();
 
 	display_init();
+
+	display_string(0, "sup, i am alive");
 
 	display_update();
 
@@ -251,7 +303,113 @@ int main(void)
 
 	// render_image(picture);
 
-	startI2C();
+	display_string(1, "i made it here");
+	display_update();
+
+	// START OF I2C
+	display_string(0, "hello1");
+	display_update();
+	/* Set up I2C as master and clean before begin */
+	I2C1CON = 0;				 // clean-up
+	I2C1STAT = 0;				 // clean-up
+	I2C1BRG = 0x184;			 // setting BRG to recommended 100 kHz clock frequency for 80 MHz CPU
+	I2C1CONSET = 1 << 13;		 // SIDL: Stop module operation when idle
+	I2C1CONSET = 1 << 15;		 // ON: start condition
+	uint8_t gyro_data = I2C1RCV; // Clean recieve data before using
+	display_string(1, "hello2");
+	display_update();
+
+	// Set up input pins
+	TRISDSET = 1 << 8;
+	TRISFSET = 1 << 1;
+	display_string(2, "hello3");
+	display_update();
+
+	// Send start to intialize I2C message
+	// first check if idle before doing anything
+	check_if_idle();
+	I2C1CONSET = 1 << 0; // SEN: start condition enable bit
+	check_if_idle();
+	display_string(3, "hello4");
+	display_update();
+
+	// send slave address with write bit
+	/* I2C1TRN = (ACCELEROMETER_ADDR << 1); // TRN: transmit accelerometer address onto I2C bus
+	check_if_idle(); */
+	// keep sending until ack is received
+	while (send((ACCELEROMETER_ADDR << 1)) != 1)
+		;
+	display_string(0, "hello5");
+	display_update();
+
+	// send register address
+	check_if_idle();
+	while (send(WHO_AM_I_XM) != 1)
+		;
+	display_string(1, "hello6");
+	display_update();
+
+	// send restart condition
+	check_if_idle();
+	I2C1CONSET = 1 << 1; // set restart condition
+	check_if_idle();
+
+	// send slave address with read bit
+	while (send(((ACCELEROMETER_ADDR << 1) | 1)) != 1)
+		;
+
+	display_string(2, "hello7");
+	display_update();
+
+	// recv data from slave
+	check_if_idle();
+	I2C1CONSET = 1 << 3; // enable recv
+	check_if_idle();
+	I2C1STATCLR = 1 << 6; // set bit 6 to 0
+	uint8_t mydata = I2C1RCV;
+	display_string(3, "hello8");
+	display_update();
+
+	// send NACK
+	I2C1CON = 1 << 5; // ACKDT
+	// stop
+	I2C1CON = 1 << 2;
+	display_string(0, "hello9");
+	display_update();
+
+	// print the value from uint8_t to char array
+	char thebits[8];
+	int i;
+	for (i = 0; i < 8; i++)
+	{
+		// uint8_t onebit = mydata & 1;
+		int onebit = (mydata & (1 << i));
+		if (onebit == 1)
+		{
+			thebits[i] = '1';
+		}
+		else
+		{
+			thebits[i] = '0';
+		}
+	}
+
+	display_string(1, "hello_world");
+	/* if (thebits[7] == 1)
+	{
+		display_string(0, "one");
+	}
+	else if (thebits[7] == 0)
+	{
+		display_string(0, "zero");
+	} */
+	display_string(0, thebits);
+	display_update();
+
+	// SCL -> J11 SCL -> 19/A5 -> RB14
+	// SDA -> J11 SDA -> 18/A4 -> RB12
+
+	// startI2C();
 
 	/*display_string(0, "KTH/ICT lab");
 	display_string(1, "in Computah");
@@ -262,10 +420,10 @@ int main(void)
 
 	// labinit(); Do any lab-specific initialization
 
-	while (1)
+	/* while (1)
 	{
 		// labwork(); Do lab-specific things again and again
-	}
+	} */
 
 	return 0;
 }
