@@ -194,6 +194,13 @@ int send(uint8_t tobBeSent)
 	return (!(I2C1STAT & (1 << 15)));
 }
 
+void start_I2C()
+{
+	check_if_idle();
+	I2C1CONSET = 1 << 0; // SEN: start condition enable bit
+	check_if_idle();
+}
+
 void startI2C()
 {
 	display_string(0, "hello1");
@@ -310,12 +317,12 @@ int main(void)
 	display_string(0, "hello1");
 	display_update();
 	/* Set up I2C as master and clean before begin */
-	I2C1CON = 0;				 // clean-up
-	I2C1STAT = 0;				 // clean-up
-	I2C1BRG = 0x184;			 // setting BRG to recommended 100 kHz clock frequency for 80 MHz CPU
-	I2C1CONSET = 1 << 13;		 // SIDL: Stop module operation when idle
-	I2C1CONSET = 1 << 15;		 // ON: start condition
-	uint8_t gyro_data = I2C1RCV; // Clean recieve data before using
+	I2C1CON = 0x0;			// clean-up
+	I2C1STAT = 0x0;			// clean-up
+	I2C1BRG = 0x184;		// setting BRG to recommended 100 kHz clock frequency for 80 MHz CPU
+	I2C1CONSET = 1 << 13;	// SIDL: Stop module operation when idle
+	I2C1CONSET = 1 << 15;	// ON: start condition
+	uint8_t data = I2C1RCV; // Clean recieve data before using
 	display_string(1, "hello2");
 	display_update();
 
@@ -338,14 +345,14 @@ int main(void)
 	check_if_idle(); */
 	// keep sending until ack is received
 	while (send((ACCELEROMETER_ADDR << 1)) != 1)
-		;
+	{
+		start_I2C();
+	};
 	display_string(0, "hello5");
 	display_update();
 
 	// send register address
-	check_if_idle();
-	while (send(WHO_AM_I_XM) != 1)
-		;
+	send(WHO_AM_I_XM);
 	display_string(1, "hello6");
 	display_update();
 
@@ -356,7 +363,11 @@ int main(void)
 
 	// send slave address with read bit
 	while (send(((ACCELEROMETER_ADDR << 1) | 1)) != 1)
-		;
+	{
+		check_if_idle();
+		I2C1CONSET = 1 << 1; // set restart condition
+		check_if_idle();
+	};
 
 	display_string(2, "hello7");
 	display_update();
@@ -371,14 +382,19 @@ int main(void)
 	display_update();
 
 	// send NACK
-	I2C1CON = 1 << 5; // ACKDT
-	// stop
-	I2C1CON = 1 << 2;
+	check_if_idle();
+	I2C1CONSET = 1 << 5; // ACKDT
+	I2C1CONSET = 1 << 4; // ACKEN
 	display_string(0, "hello9");
 	display_update();
 
+	// stop
+	check_if_idle();
+	I2C1CONSET = 1 << 2; // PEN: stop condition enable bit
+	check_if_idle();
+
 	// print the value from uint8_t to char array
-	char thebits[8];
+	char thebits[9];
 	int i;
 	for (i = 0; i < 8; i++)
 	{
@@ -388,11 +404,12 @@ int main(void)
 		{
 			thebits[i] = '1';
 		}
-		else
+		else if (onebit == 0)
 		{
 			thebits[i] = '0';
 		}
 	}
+	thebits[9] = '\0';
 
 	display_string(1, "hello_world");
 	/* if (thebits[7] == 1)
