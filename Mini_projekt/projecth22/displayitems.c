@@ -629,7 +629,7 @@ void addBrakeLight()
     int i, j;
     for (i = 0; i < 32; i++)
     {
-        for (j = 0; j < 27; j++)
+        for (j = 0; j < 68; j++)
         {
             if (BrakeLight[i][j] == 1)
             {
@@ -643,7 +643,7 @@ void removeBrakeLight()
     int i, j;
     for (i = 0; i < 32; i++)
     {
-        for (j = 0; j < 27; j++)
+        for (j = 0; j < 68; j++)
         {
             if (BrakeLight[i][j] == 1)
             {
@@ -710,7 +710,7 @@ void removeFromScreen(char toRemove[32][128])
 void update_screen()
 {
     translate_image(Screen);
-    // render_image(DrawingScreen);
+    render_image(DrawingScreen);
 }
 
 void clearScreen()
