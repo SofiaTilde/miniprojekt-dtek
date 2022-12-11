@@ -235,18 +235,19 @@ void startI2C()
 
 int main(void)
 {
-
-	initiate_spi();
-	display_init();
-	display_update();
-	screen_init();
-
+	/*
+		initiate_spi();
+		display_init();
+		display_update();
+		screen_init();
+	//*/
 	// startI2C();
 	testStuff();
+	/*
 	while (1)
 	{
 		doScreenStuff();
 	}
-
+	//*/
 	return 0;
 }
