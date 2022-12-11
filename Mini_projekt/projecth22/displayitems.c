@@ -588,39 +588,48 @@ void doScreenStuff()
         if (btn1 == 1)
         {
             ChangeScreen(Bike);
+            update_screen();
         }
         if (btn2 == 1)
         {
             ChangeScreen(Sensitivity);
+            update_screen();
         }
         if (btn3 == 1)
         {
             ChangeScreen(Histogram);
+            update_screen();
         }
     }
     else if (CurrentScreen == Bike)
     {
         if (btn4 == 1)
         {
-            if (ToggleActiveLeftManualArrow == 1)
+            if (ActiveLeftManualArrow == 1)
             {
-                ToggleActiveLeftManualArrow = 0;
+                ActiveLeftManualArrow = 0;
+                removeFromScreen(LeftManualArrow);
             }
             else
             {
-                ToggleActiveLeftManualArrow = 1;
+                ActiveLeftManualArrow = 1;
+                addToScreen(LeftManualArrow);
             }
+            update_screen();
         }
         if (btn3 == 1)
         {
-            if (ToggleActiveRightManualArrow == 1)
+            if (ActiveRightManualArrow == 1)
             {
-                ToggleActiveRightManualArrow = 0;
+                ActiveRightManualArrow = 0;
+                removeFromScreen(RightManualArrow);
             }
             else
             {
-                ToggleActiveRightManualArrow = 1;
+                ActiveRightManualArrow = 1;
+                addToScreen(RightManualArrow);
             }
+            update_screen();
         }
         if (btn2 == 1)
         {
@@ -639,6 +648,7 @@ void doScreenStuff()
         if (btn1 == 1)
         {
             ChangeScreen(MainMenu);
+            update_screen();
         }
     }
     else if (CurrentScreen == Sensitivity)
@@ -691,73 +701,7 @@ void testStuff()
     debug_image(Screen);
 }
 
-/* Interrupt Service Routine */
-void user_isr(void)
-{
-    // checking if bit 8 indicates flag
-    if ((IFS(0) & 0x00000100) != 0)
-    {
-        // set interrupt flag to 0
-        // IFS(0) = 0;
-        IFS(0) = IFS(0) & 0xFFFFFEFF;
-
-        timeoutcount += 1;
-
-        if (timeoutcount >= 10)
-        {
-            timeoutcount = 0;
-
-            if (ToggleActiveLeftManualArrow == 1)
-            {
-                if (ActiveLeftManualArrow == 1)
-                {
-                    removeFromScreen(LeftManualArrow);
-                }
-                else
-                {
-                    addToScreen(LeftManualArrow);
-                }
-            }
-            if (ToggleActiveRightManualArrow == 1)
-            {
-                if (ActiveRightManualArrow == 1)
-                {
-                    removeFromScreen(RightManualArrow);
-                }
-                else
-                {
-                    addToScreen(RightManualArrow);
-                }
-            }
-
-            if (ToggleActiveLeftAutomaticArrow == 1)
-            {
-                if (ActiveLeftAutomaticArrow == 1)
-                {
-                    removeFromScreen(LeftAutomaticArrow);
-                }
-                else
-                {
-                    addToScreen(LeftAutomaticArrow);
-                }
-            }
-            if (ToggleActiveRightAutomaticArrow == 1)
-            {
-                if (ActiveRightAutomaticArrow == 1)
-                {
-                    removeFromScreen(RightAutomaticArrow);
-                }
-                else
-                {
-                    addToScreen(RightAutomaticArrow);
-                }
-            }
-
-            update_screen();
-        }
-    }
-}
-/*
+///*
 void screen_init()
 {
     // mask
@@ -794,7 +738,7 @@ void screen_init()
     IEC(0) += (1 << 11);
     IPC(2) += 0x1F000000;
 
-    enable_interrupt();
+    // enable_interrupt();
     return;
 }
-*/
+//*/
