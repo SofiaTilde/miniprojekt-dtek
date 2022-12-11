@@ -1,2 +1,0 @@
-display_main_menu.c.o: display_main_menu.c
-display_main_menu.c :
