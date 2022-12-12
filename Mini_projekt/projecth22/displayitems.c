@@ -1,4 +1,16 @@
+
+#include "accelerometer.h"
+#include "displayitems.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h> /* Declarations of uint_32 and the like */
+#include <stdbool.h>
 #include "pic32mx.h" /* Declarations of system-specific addresses etc */
+#include "mipslab.h" /* Declatations for these labs */
+//#include "mipslabdata.h" /* Drawing declarations */
+#include "mipslabfunc.h"
+//#include "accelerometer.h"
 
 void render_image(char *data);
 void translate_image(char toTranslate[32][128]);
@@ -13,14 +25,14 @@ extern void enable_interrupt();
 
 volatile int *porte = (volatile int *)0xbf886110;
 
-enum ScreenType
+/* enum ScreenType
 {
     MainMenu,
     Bike,
     XYZ,
     Histogram
 };
-enum ScreenType CurrentScreen = MainMenu;
+enum ScreenType CurrentScreen = MainMenu; */
 
 char Screen[32][128];
 /*char Screen[32][128] =
@@ -552,19 +564,60 @@ char XYZScreen2[32][9] =
         {0, 0, 1, 1, 1, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
-int ActiveLeftAutomaticArrow = 0;
+/* int ActiveLeftAutomaticArrow = 0;
 int ActiveRightAutomaticArrow = 0;
 int ActiveLeftManualArrow = 0;
 int ActiveRightManualArrow = 0;
 int ActiveBrakeLight = 0;
 
 int sensitivity = 0;
-int timeoutcount = 0;
+int timeoutcount = 0; */
 
-// remove later
-char x[17] = "0101010101010101";
-char y[17] = "0101010101010101";
-char z[17] = "0101010101010101";
+// accl data variables
+char x[17] = "0000000000000000";
+char y[17] = "0000000000000000";
+char z[17] = "0000000000000000";
+
+void converter(uint16_t mydata, char accl)
+{
+    char thebits[17] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '\0'};
+    int i;
+    int onebit;
+    for (i = 0; i < 16; i++)
+    {
+        // uint8_t onebit = mydata & 1;
+        // onebit = (mydata & (1 << (7 - i)));
+        if (mydata & (1 << (15 - i)))
+        {
+            thebits[i] = '1';
+        }
+    }
+
+    if (accl == 'x')
+    {
+        int h;
+        for (h = 0; h < 16; h++)
+        {
+            x[h] = thebits[h];
+        }
+    }
+    else if (accl == 'y')
+    {
+        int h;
+        for (h = 0; h < 16; h++)
+        {
+            y[h] = thebits[h];
+        }
+    }
+    else if (accl == 'z')
+    {
+        int h;
+        for (h = 0; h < 16; h++)
+        {
+            z[h] = thebits[h];
+        }
+    }
+}
 
 void addLeftManualArrow()
 {
@@ -1042,6 +1095,12 @@ void doScreenStuff()
     }
     else if (CurrentScreen == XYZ)
     {
+        xyz_data temporary;
+        temporary = getACCL_XYZ_I2C();
+        converter(temporary.x_data, 'x');
+        converter(temporary.y_data, 'y');
+        converter(temporary.z_data, 'z');
+
         if (btn1 == 1)
         {
             ChangeScreen(MainMenu);
@@ -1124,5 +1183,39 @@ void screen_init()
     // enable_interrupt();
     clearScreen();
     return;
+}
+int main(void)
+{
+    // display setup
+    initiate_spi();
+    display_init();
+    display_update();
+    screen_init();
+    ChangeScreen(MainMenu);
+    update_screen();
+
+    // START OF I2C
+    I2C_setup();
+
+    // Set up input pins
+    TRISDSET = 1 << 8;
+    TRISFSET = 1 << 1;
+
+    // acceletometer configurations setup
+    ACCEL_config_I2C();
+
+    // start reading accl data
+    // Send start to intialize I2C message
+    // start_I2C();
+
+    // getWHOAMI();
+
+    while (1)
+    {
+        delay_I2C();
+        doScreenStuff();
+    }
+
+    return 0;
 }
 //*/

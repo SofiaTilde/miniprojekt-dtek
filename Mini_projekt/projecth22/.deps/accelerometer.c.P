@@ -1,6 +1,4 @@
-displayitems.c.o: displayitems.c accelerometer.h \
- /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h \
- displayitems.h \
+accelerometer.c.o: accelerometer.c \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdio.h \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/_ansi.h \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/newlib.h \
@@ -21,11 +19,10 @@ displayitems.c.o: displayitems.c accelerometer.h \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdlib.h \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/machine/stdlib.h \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/alloca.h \
+ /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h \
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdbool.h \
- pic32mx.h mipslab.h mipslabfunc.h
-displayitems.c accelerometer.h :
- /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h :
- displayitems.h :
+ pic32mx.h mipslab.h mipslabfunc.h accelerometer.h
+accelerometer.c :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdio.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/_ansi.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/newlib.h :
@@ -46,5 +43,6 @@ displayitems.c accelerometer.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdlib.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/machine/stdlib.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/alloca.h :
+ /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdint.h :
  /Users/saradanielsson/Downloads/chipkit-core/pic32/compiler/pic32-tools/pic32mx/include/stdbool.h :
- pic32mx.h mipslab.h mipslabfunc.h :
+ pic32mx.h mipslab.h mipslabfunc.h accelerometer.h :
