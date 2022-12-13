@@ -4,65 +4,8 @@
 #include <stdbool.h>
 #include "pic32mx.h" /* Declarations of system-specific addresses etc */
 #include "mipslab.h" /* Declatations for these labs */
-//#include "mipslabdata.h" /* Drawing declarations */
 #include "mipslabfunc.h"
-//#include "displayitems.c"
 #include "accelerometer.h"
-
-/////////////////////////////////////////
-// LSM9DS1 Accel/Gyro (XL/G) Registers //
-/////////////////////////////////////////
-#define ACCELEROMETER_ADDR 0x6B
-#define ACT_THS 0x04
-#define ACT_DUR 0x05
-#define INT_GEN_CFG_XL 0x06
-#define INT_GEN_THS_X_XL 0x07
-#define INT_GEN_THS_Y_XL 0x08
-#define INT_GEN_THS_Z_XL 0x09
-#define INT_GEN_DUR_XL 0x0A
-#define REFERENCE_G 0x0B
-#define INT1_CTRL 0x0C
-#define INT2_CTRL 0x0D
-#define WHO_AM_I_XG 0x0F
-#define CTRL_REG1_G 0x10
-#define CTRL_REG2_G 0x11
-#define CTRL_REG3_G 0x12
-#define ORIENT_CFG_G 0x13
-#define INT_GEN_SRC_G 0x14
-#define OUT_TEMP_L 0x15
-#define OUT_TEMP_H 0x16
-#define STATUS_REG_0 0x17
-#define OUT_X_L_G 0x18
-#define OUT_X_H_G 0x19
-#define OUT_Y_L_G 0x1A
-#define OUT_Y_H_G 0x1B
-#define OUT_Z_L_G 0x1C
-#define OUT_Z_H_G 0x1D
-#define CTRL_REG4 0x1E
-#define CTRL_REG5_XL 0x1F
-#define CTRL_REG6_XL 0x20
-#define CTRL_REG7_XL 0x21
-#define CTRL_REG8 0x22
-#define CTRL_REG9 0x23
-#define CTRL_REG10 0x24
-#define INT_GEN_SRC_XL 0x26
-#define STATUS_REG_1 0x27
-#define OUT_X_L_XL 0x28
-#define OUT_X_H_XL 0x29
-#define OUT_Y_L_XL 0x2A
-#define OUT_Y_H_XL 0x2B
-#define OUT_Z_L_XL 0x2C
-#define OUT_Z_H_XL 0x2D
-#define FIFO_CTRL 0x2E
-#define FIFO_SRC 0x2F
-#define INT_GEN_CFG_G 0x30
-#define INT_GEN_THS_XH_G 0x31
-#define INT_GEN_THS_XL_G 0x32
-#define INT_GEN_THS_YH_G 0x33
-#define INT_GEN_THS_YL_G 0x34
-#define INT_GEN_THS_ZH_G 0x35
-#define INT_GEN_THS_ZL_G 0x36
-#define INT_GEN_DUR_G 0x37
 
 /* Global variables */
 // declare array to hold the high and low 8 bits (total 16 bits) for X, Y and Z.
@@ -72,13 +15,14 @@ uint16_t x_data;
 uint16_t y_data;
 uint16_t z_data;
 
+// oled communication init
 void initiate_spi()
 {
     /*
-This will set the peripheral bus clock to the same frequency
-as the sysclock. That means 80 MHz, when the microcontroller
-is running at 80 MHz. Changed 2017, as recommended by Axel.
-*/
+    This will set the peripheral bus clock to the same frequency
+    as the sysclock. That means 80 MHz, when the microcontroller
+    is running at 80 MHz. Changed 2017, as recommended by Axel.
+    */
     SYSKEY = 0xAA996655; /* Unlock OSCCON, step 1 */
     SYSKEY = 0x556699AA; /* Unlock OSCCON, step 2 */
     while (OSCCON & (1 << 21))
@@ -119,6 +63,7 @@ is running at 80 MHz. Changed 2017, as recommended by Axel.
     SPI2CONSET = 0x8000;
 }
 
+// check if bus is free or not
 void check_if_idle()
 {
     // Check lowest 5 bits of I2C1CON to check if idle
@@ -129,7 +74,7 @@ void check_if_idle()
         ;
 }
 
-// send i2c
+// send data
 bool send_I2C(uint8_t tobBeSent)
 {
     check_if_idle();
@@ -139,6 +84,7 @@ bool send_I2C(uint8_t tobBeSent)
     return !(I2C1STAT & (1 << 15));
 }
 
+// recv data from peripherial
 uint8_t recv_I2C()
 {
     check_if_idle();
@@ -148,6 +94,7 @@ uint8_t recv_I2C()
     return I2C1RCV;
 }
 
+// set start condition
 void start_I2C()
 {
     check_if_idle();
@@ -155,6 +102,7 @@ void start_I2C()
     check_if_idle();
 }
 
+// set restart condition
 void restart_I2C()
 {
     check_if_idle();
@@ -162,6 +110,7 @@ void restart_I2C()
     check_if_idle();
 }
 
+// setup before starting I2C message
 void I2C_setup()
 {
     /* Set up I2C as master and clean before begin */
@@ -173,6 +122,7 @@ void I2C_setup()
     uint8_t data = I2C1RCV; // Clean recieve data before using
 }
 
+// set no acknowledgement
 void NACK_I2C()
 {
     check_if_idle();
@@ -180,6 +130,7 @@ void NACK_I2C()
     I2C1CONSET = 1 << 4; // ACKEN
 }
 
+// set acknowledge
 void ACK_I2C()
 {
     check_if_idle();
@@ -187,6 +138,7 @@ void ACK_I2C()
     I2C1CONSET = 1 << 4; // ACKEN
 }
 
+// set stop
 void stop_I2C()
 {
     check_if_idle();
@@ -194,9 +146,11 @@ void stop_I2C()
     check_if_idle();
 }
 
-xyz_data getACCL_XYZ_I2C()
+// get acceleration data from peripheral
+xyz_data getACCL_XYZ_I2C(int adress)
 {
 
+    // send start until address and write bit to peripheral is acknowledged
     do
     {
         start_I2C();
@@ -204,16 +158,18 @@ xyz_data getACCL_XYZ_I2C()
     } while (!send_I2C(ACCELEROMETER_ADDR << 1));
 
     // send register address
-    send_I2C(OUT_X_L_XL);
+    // send_I2C(OUT_X_L_XL);
+    send_I2C(adress);
 
-    // send slave address with read bit
+    // send restart until address with read bit is acknowledged by peripheral
     do
     {
         restart_I2C();
 
     } while (!send_I2C((ACCELEROMETER_ADDR << 1) | 1));
 
-    // recv data
+    // recv data from peripheral
+    // will read from low bits of the x register all the way through to the high bits of the z register
     int j;
     for (j = 0; j < 5; j++)
     {
@@ -236,43 +192,10 @@ xyz_data getACCL_XYZ_I2C()
     current.y_data = (accel_data[3] << 8) | accel_data[2];
     current.z_data = (accel_data[5] << 8) | accel_data[4];
 
-    // print the value from uint16_t to char array
-    /*  char xyz_data;
-     char thebits[17] = {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '\0'};
-     int s;
-     for (s = 0; s < 3; s++)
-     {
-
-         int i;
-         int onebit;
-         for (i = 0; i < 16; i++)
-         {
-             // uint8_t onebit = mydata & 1;
-             // onebit = (mydata & (1 << (7 - i)));
-             if (mydata & (1 << (15 - i)))
-             {
-                 thebits[i] = '1';
-             }
-         }
-     } */
-
-    /* char thebits[9] = {'0', '0', '0', '0', '0', '0', '0', '0', '\0'};
-    int i;
-    int onebit;
-    for (i = 0; i < 8; i++)
-    {
-        // uint8_t onebit = mydata & 1;
-        // onebit = (mydata & (1 << (7 - i)));
-        if (mydata & (1 << (7 - i)))
-        {
-            thebits[i] = '1';
-        }
-    } */
-    // display_string(1, thebits);
-    // display_update();
     return current;
 }
 
+// delay
 void delay_I2C()
 {
     int k;
@@ -280,6 +203,7 @@ void delay_I2C()
         ;
 }
 
+// to test if contact with Pmod is achieved
 /* void getWHOAMI()
 {
     do
@@ -324,6 +248,7 @@ void delay_I2C()
     display_update();
 } */
 
+// before message transmission start setup for accelerometer
 void ACCEL_config_I2C()
 {
     do
@@ -331,7 +256,7 @@ void ACCEL_config_I2C()
         start_I2C();
     } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
     send_I2C(CTRL_REG5_XL);
-    send_I2C(0x38);
+    send_I2C(0x38); // all register bits are set to default values
     stop_I2C();
 
     do
@@ -339,7 +264,7 @@ void ACCEL_config_I2C()
         start_I2C();
     } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
     send_I2C(CTRL_REG6_XL);
-    send_I2C(0x78);
+    send_I2C(0x78); // set to +-8g, 211 Hz
     stop_I2C();
 
     do
@@ -347,6 +272,6 @@ void ACCEL_config_I2C()
         start_I2C();
     } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
     send_I2C(CTRL_REG7_XL);
-    send_I2C(0x00);
+    send_I2C(0x00); // set to disabled, internal and filter bypassed
     stop_I2C();
 }

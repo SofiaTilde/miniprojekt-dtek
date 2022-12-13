@@ -18,7 +18,3 @@ int ActiveBrakeLight = 0;
 
 int sensitivity = 0;
 int timeoutcount = 0;
-
-/* char x[17] = "0000000000000000";
-char y[17] = "0000000000000000";
-char z[17] = "0000000000000000"; */
