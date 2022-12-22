@@ -29,12 +29,12 @@ char z[17] = "0000000000000000";
 int xInt;
 int yInt;
 int zInt;
-int xRot;          // rotation of x that is a value between -180 and 180
-int yRot = 0;      // rotation of y that is a value between -180 and 180
-int zRot;          // rotation of z that is a value between -180 and 180
+int xRot = 0;      // rotation of x that is a value between -180 and 180 (brake)
+int yRot = 0;      // rotation of y that is a value between -180 and 180 (left/right)
+int zRot = 0;      // rotation of z that is a value between -180 and 180
 int rightRot = 30; // the value of y when it should start/stop blinking right
 int leftRot = -30; // the value of y when it should start/stop blinking left
-int brakeRot;      // the value of x when it should start/stop displaying brake
+int brakeRot = 30; // the value of x when it should start/stop displaying brake
 
 /*
  * Converts a binary char to an integer
@@ -714,11 +714,20 @@ void doBike(int btn1, int btn2, int btn3, int btn4)
         ChangeScreen(MainMenu);
     }
 
+    // xyz data is updated here
+    xyz_data temporary;
+    temporary = getACCL_XYZ_I2C(OUT_X_L_G);
+
+    // converts uint16_t to binary representation
+    converter(temporary.x_data, 'x');
+    converter(temporary.y_data, 'y');
+    converter(temporary.z_data, 'z');
+
     if (ActiveLeftAutomaticArrow && yRot > leftRot)
     {
         ActiveLeftAutomaticArrow = false;
         ActiveLeftManualArrow = false;
-        removeLeftManualArrow;
+        removeLeftManualArrow();
     }
     else if (!ActiveLeftAutomaticArrow && yRot <= leftRot)
     {
@@ -728,30 +737,30 @@ void doBike(int btn1, int btn2, int btn3, int btn4)
             addLeftAutomaticArrow();
         }
     }
-
     if (ActiveRightAutomaticArrow && yRot < rightRot)
     {
         ActiveRightAutomaticArrow = false;
         ActiveRightManualArrow = false;
-        removeRightManualArrow;
+        removeRightManualArrow();
     }
     else if (!ActiveRightAutomaticArrow && yRot >= rightRot)
     {
         ActiveRightAutomaticArrow = true;
         if (!ActiveRightManualArrow)
         {
-            addRIghtAutomaticArrow();
+            addRightAutomaticArrow();
         }
     }
-
-    // xyz data is updated here
-    xyz_data temporary;
-    temporary = getACCL_XYZ_I2C(OUT_X_L_G);
-
-    // converts uint16_t to binary representation
-    converter(temporary.x_data, 'x');
-    converter(temporary.y_data, 'y');
-    converter(temporary.z_data, 'z');
+    if (ActiveBrakeLight && xRot < brakeRot)
+    {
+        ActiveBrakeLight = false;
+        removeBrakeLight();
+    }
+    else if (!ActiveBrakeLight && xRot >= brakeRot)
+    {
+        ActiveBrakeLight = true;
+        addBrakeLight();
+    }
 
     update_screen();
 }
