@@ -10,10 +10,14 @@
 /* Global variables */
 // declare array to hold the high and low 8 bits (total 16 bits) for X, Y and Z.
 uint8_t accel_data[6];
+uint8_t gyro_data[6];
 // variables to hold the full X, Y and Z results.
 uint16_t x_data;
 uint16_t y_data;
 uint16_t z_data;
+uint16_t x_gyro_data;
+uint16_t y_gyro_data;
+uint16_t z_gyro_data;
 
 // oled communication init
 void initiate_spi()
@@ -158,7 +162,6 @@ xyz_data getACCL_XYZ_I2C(int adress)
     } while (!send_I2C(ACCELEROMETER_ADDR << 1));
 
     // send register address
-    // send_I2C(OUT_X_L_XL);
     send_I2C(adress);
 
     // send restart until address with read bit is acknowledged by peripheral
@@ -193,6 +196,54 @@ xyz_data getACCL_XYZ_I2C(int adress)
     current.z_data = (accel_data[5] << 8) | accel_data[4];
 
     return current;
+}
+
+// get gyro data from peripheral
+gyro_data_xyz getGYRO_XYZ_I2C(int adress)
+{
+
+    // send start until address and write bit to peripheral is acknowledged
+    do
+    {
+        start_I2C();
+
+    } while (!send_I2C(ACCELEROMETER_ADDR << 1));
+
+    // send register address
+    send_I2C(adress);
+
+    // send restart until address with read bit is acknowledged by peripheral
+    do
+    {
+        restart_I2C();
+
+    } while (!send_I2C((ACCELEROMETER_ADDR << 1) | 1));
+
+    // recv data from peripheral
+    // will read from low bits of the x register all the way through to the high bits of the z register
+    int j;
+    for (j = 0; j < 5; j++)
+    {
+        gyro_data[j] = recv_I2C(); // grab 8 bits of data at a time
+        ACK_I2C();                 // sends master ACK to confirm more data can be sent
+    }
+
+    // recv last 8 bits outside of loop to send Nack instead of mack after
+    gyro_data[5] = recv_I2C();
+
+    // send NACK
+    NACK_I2C();
+
+    // send stop
+    stop_I2C();
+
+    gyro_data_xyz this_gyro;
+    // formatting high and low bits for each value to one complete X, Y and Z result
+    this_gyro.x_gyro_data = (gyro_data[1] << 8) | gyro_data[0];
+    this_gyro.y_gyro_data = (gyro_data[3] << 8) | gyro_data[2];
+    this_gyro.z_gyro_data = (gyro_data[5] << 8) | gyro_data[4];
+
+    return this_gyro;
 }
 
 // delay
@@ -264,7 +315,7 @@ void ACCEL_config_I2C()
         start_I2C();
     } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
     send_I2C(CTRL_REG6_XL);
-    send_I2C(0x78); // set to +-8g, 211 Hz
+    send_I2C(0x09); // set to +-16g, 211 Hz
     stop_I2C();
 
     do
@@ -273,5 +324,49 @@ void ACCEL_config_I2C()
     } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
     send_I2C(CTRL_REG7_XL);
     send_I2C(0x00); // set to disabled, internal and filter bypassed
+    stop_I2C();
+}
+
+void GYRO_config_I2C()
+{
+    do
+    {
+        start_I2C();
+    } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
+    send_I2C(CTRL_REG1_G);
+    send_I2C(0x58); // ODR[Hz] = 238 and Cutoff[Hz] = 76
+    // send_I2C(0x80); // ODR[Hz] = 238 (100) and Cutoff[Hz] = 14 (00)  (rest of bits 0)
+    stop_I2C();
+
+    do
+    {
+        start_I2C();
+    } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
+    send_I2C(CTRL_REG2_G);
+    send_I2C(0x0); // all bits set to default (00000000)
+    stop_I2C();
+
+    do
+    {
+        start_I2C();
+    } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
+    send_I2C(CTRL_REG3_G);
+    send_I2C(0x0); // default
+    stop_I2C();
+
+    do
+    {
+        start_I2C();
+    } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
+    send_I2C(ORIENT_CFG_G);
+    send_I2C(0x0); // set to default (00000000)
+    stop_I2C();
+
+    do
+    {
+        start_I2C();
+    } while (!send_I2C((ACCELEROMETER_ADDR << 1)));
+    send_I2C(CTRL_REG4);
+    send_I2C(0x38); // activate gyroscope yaw, roll and pitch axis (00111000)
     stop_I2C();
 }

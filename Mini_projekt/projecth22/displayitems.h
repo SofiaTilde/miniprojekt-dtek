@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 volatile int *porte;
 enum ScreenType
@@ -6,7 +7,8 @@ enum ScreenType
     MainMenu,
     Bike,
     XYZ,
-    Histogram
+    Histogram,
+    GyroXYZ
 };
 enum ScreenType CurrentScreen = MainMenu;
 

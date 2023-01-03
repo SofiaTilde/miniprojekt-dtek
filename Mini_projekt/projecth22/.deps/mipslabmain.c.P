@@ -1,2 +1,0 @@
-mipslabmain.c.o: mipslabmain.c
-mipslabmain.c :
