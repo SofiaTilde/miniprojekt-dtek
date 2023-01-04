@@ -71,6 +71,7 @@ typedef struct gyro
     volatile uint16_t z_gyro_data;
 } gyro_data_xyz;
 
+// struct to hold signed accelerometer data
 typedef struct accel
 {
     volatile int16_t x_data;
