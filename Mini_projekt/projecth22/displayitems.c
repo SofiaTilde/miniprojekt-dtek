@@ -29,15 +29,18 @@ char z[17] = "0000000000000000";
 int xInt;
 int yInt;
 int zInt;
+
+accel_data acc_global_data;
+
 char xRotArray[17] = "0000000000000000";
 char yRotArray[17] = "0000000000000000";
 char zRotArray[17] = "0000000000000000";
-float xRot = 0;     // rotation of x that is a value between -180 and 180 (brake)
-float yRot = 0;     // rotation of y that is a value between -180 and 180 (left/right)
-float zRot = 0;     // rotation of z that is a value between -180 and 180
-int rightRot = 0.1; // the value of y when it should start/stop blinking right
-int leftRot = -0.1; // the value of y when it should start/stop blinking left
-int brakeRot = 1;   // the value of x when it should start/stop displaying brake
+float xRot = 0;      // rotation of x that is a value between -180 and 180 (brake)
+float yRot = 0;      // rotation of y that is a value between -180 and 180 (left/right)
+float zRot = 0;      // rotation of z that is a value between -180 and 180
+float minRot = -2.0; // the value of y when it should start/stop blinking right
+float maxRot = 2.0;  // the value of y when it should start/stop blinking left
+float brakeRot = 1;  // the value of x when it should start/stop displaying brake
 char bx[20] = "00000000000000000000";
 char by[20] = "00000000000000000000";
 char bz[20] = "00000000000000000000";
@@ -105,24 +108,113 @@ void binaryToInt(int xChars[17], int yChars[17], int zChars[17])
     }
 }
 
+void uint16toGfloat()
+{
+    xRot = 0.0;
+    yRot = 0.0;
+    zRot = 0.0;
+    if (acc_global_data.x_data > 32767)
+    {
+        xRot = acc_global_data.x_data - 32767.0;
+    }
+    else
+    {
+        xRot = acc_global_data.x_data * 1.0;
+    }
+
+    if (acc_global_data.y_data > 32767)
+    {
+        yRot = acc_global_data.y_data - 32767.0;
+    }
+    else
+    {
+        yRot = acc_global_data.y_data * 1.0;
+    }
+
+    if (acc_global_data.z_data > 32767)
+    {
+        zRot = acc_global_data.z_data - 32767.0;
+    }
+    else
+    {
+        zRot = acc_global_data.z_data * 1.0;
+    }
+
+    // calculating how many g's
+    xRot = ((xRot / 32767.0) * 16);
+    yRot = ((yRot / 32767.0) * 16);
+    zRot = ((zRot / 32767.0) * 16);
+}
+
 void binaryToFloat(char xChars[17], char yChars[17], char zChars[17])
 {
-    int numbers[16] = {32744, 16372, 8186, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+    xRot = 0;
+    yRot = 0;
+    zRot = 0;
+    int numbers[15] = {16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+
     int i;
+    int j = 0;
     for (i = 1; i < 16; i++)
     {
         if (xChars[i] == '1')
         {
-            xRot += numbers[i];
+            xRot += numbers[j];
         }
         if (yChars[i] == '1')
         {
-            yRot += numbers[i];
+            yRot += numbers[j];
         }
         if (zChars[i] == '1')
         {
-            zRot += numbers[i];
+            zRot += numbers[j];
         }
+        j++;
+    }
+
+    // fix the signs, 1 means negative
+    if (xChars[0] == '1')
+    {
+        xRot = (xRot * (-1));
+    }
+    if (yChars[0] == '1')
+    {
+        yRot = (yRot * (-1));
+    }
+    if (zChars[0] == '1')
+    {
+        zRot = (zRot * (-1));
+    }
+
+    // calculating how many g's
+    xRot = ((xRot / 32767) * 16);
+    yRot = ((yRot / 32767) * 16);
+    zRot = ((zRot / 32767) * 16);
+}
+
+void binaryToFloat1(char xChars[17], char yChars[17], char zChars[17])
+{
+    xRot = 0;
+    yRot = 0;
+    zRot = 0;
+    int numbers[15] = {16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
+    int i;
+    int j = 0;
+    for (i = 1; i < 16; i++)
+    {
+        if (xChars[i] == '1')
+        {
+            xRot += numbers[j];
+        }
+        if (yChars[i] == '1')
+        {
+            yRot += numbers[j];
+        }
+        if (zChars[i] == '1')
+        {
+            zRot += numbers[j];
+        }
+        j++;
     }
 
     // fix the signs, 1 means negative
@@ -746,28 +838,6 @@ void ChangeScreen(enum ScreenType ChangeTo)
         // addXYZPlace(2, z);
         // update_screen();
     }
-    // else if (ChangeTo == GyroXYZ) // test function
-    // {
-    //     CurrentScreen = GyroXYZ;
-    //     addXYZ();
-
-    //     // xyz data is updated here
-    //     gyro_data_xyz temporary;
-    //     temporary = getGYRO_XYZ_I2C(OUT_X_L_G);
-
-    //     // converts uint16_t to binary representation
-    //     // converter(temporary.x_gyro_data, 'xRot');
-    //     // converter(temporary.y_gyro_data, 'yRot');
-    //     // converter(temporary.z_gyro_data, 'zRot');
-    //     converter(temporary.x_gyro_data, 'a');
-    //     converter(temporary.y_gyro_data, 'b');
-    //     converter(temporary.z_gyro_data, 'c');
-    //     // binaryToInt(xRotArray, yRotArray, zRotArray);
-
-    //     addXYZPlace(0, xRotArray);
-    //     addXYZPlace(1, yRotArray);
-    //     addXYZPlace(2, zRotArray);
-    // }
     else if (ChangeTo == XYZ)
     {
         CurrentScreen = XYZ;
@@ -825,80 +895,90 @@ void doMainMenu(int btn1, int btn2, int btn3, int btn4)
 }
 void doBike(int btn1, int btn2, int btn3, int btn4)
 {
-    if (btn4 == 1)
-    {
-        if (ActiveLeftManualArrow)
-        {
-            ActiveLeftManualArrow = false;
-            removeLeftManualArrow();
-        }
-        else
-        {
-            ActiveLeftManualArrow = true;
-            addLeftManualArrow();
-        }
-    }
-    if (btn3 == 1)
-    {
-        if (ActiveRightManualArrow)
-        {
-            ActiveRightManualArrow = false;
-            removeRightManualArrow();
-        }
-        else
-        {
-            ActiveRightManualArrow = true;
-            addRightManualArrow();
-        }
-    }
-    if (btn2 == 1)
-    {
-        if (ActiveBrakeLight)
-        {
-            ActiveBrakeLight = false;
-            removeBrakeLight();
-        }
-        else
-        {
-            ActiveBrakeLight = true;
-            addBrakeLight();
-        }
-    }
 
-    if (btn1 == 1)
-    {
-        ChangeScreen(MainMenu);
-        update_screen();
-    }
+    // if (btn4 == 1)
+    // {
+    //     if (ActiveLeftManualArrow)
+    //     {
+    //         ActiveLeftManualArrow = false;
+    //         removeLeftManualArrow();
+    //     }
+    //     else
+    //     {
+    //         ActiveLeftManualArrow = true;
+    //         addLeftManualArrow();
+    //     }
+    // }
+    // if (btn3 == 1)
+    // {
+    //     if (ActiveRightManualArrow)
+    //     {
+    //         ActiveRightManualArrow = false;
+    //         removeRightManualArrow();
+    //     }
+    //     else
+    //     {
+    //         ActiveRightManualArrow = true;
+    //         addRightManualArrow();
+    //     }
+    // }
+    // if (btn2 == 1)
+    // {
+    //     if (ActiveBrakeLight)
+    //     {
+    //         ActiveBrakeLight = false;
+    //         removeBrakeLight();
+    //     }
+    //     else
+    //     {
+    //         ActiveBrakeLight = true;
+    //         addBrakeLight();
+    //     }
+    // }
 
     clearScreen();
-    if (yRot > leftRot)
+    // (yRot < -2.0)
+    if (acc_global_data.y_data < -350)
     {
+
+        removeLeftManualArrow();
         addRightManualArrow();
     }
-    else if (yRot <= leftRot)
-    {
-        addLeftManualArrow();
-    }
-    else if ((leftRot < yRot) && (yRot < rightRot))
+    if (acc_global_data.y_data > 350)
     {
         removeRightManualArrow();
-        removeLeftManualArrow();
+        addLeftManualArrow();
     }
+    if (acc_global_data.x_data < -600)
+    {
+        addBrakeLight();
+        update_screen();
+    }
+    update_screen();
+    // else
+    // {
+    //     removeRightManualArrow();
+    //     removeLeftManualArrow();
+    //     update_screen();
+    // }
 
-    _float_to_char(xRot, bx);
-    _float_to_char(yRot, by);
-    _float_to_char(zRot, bz);
+    // if ((zRot < 10) && (zRot > 9))
+    // {
+    //     removeRightManualArrow();
+    //     removeLeftManualArrow();
+    // }
+
+    // _float_to_char(xRot, bx);
+    // _float_to_char(yRot, by);
+    // _float_to_char(zRot, bz);
 
     // addXYZPlace(0, bx);
     // addXYZPlace(1, by);
     // addXYZPlace(2, bz);
 
-    addXYZPlace(0, x);
-    addXYZPlace(1, y);
-    addXYZPlace(2, z);
-
-    update_screen();
+    // addXYZPlace(0, x);
+    // addXYZPlace(1, y);
+    // addXYZPlace(2, z);
 
     // if (ActiveLeftAutomaticArrow && yRot > leftRot)
     // {
@@ -951,6 +1031,12 @@ void doBike(int btn1, int btn2, int btn3, int btn4)
     // addXYZPlace(2, z);
 
     // update_screen();
+
+    if (btn1 == 1)
+    {
+        ChangeScreen(MainMenu);
+        update_screen();
+    }
 }
 
 // test function
@@ -1092,34 +1178,40 @@ void screen_init()
 void readI2C()
 {
     // accelerometer xyz data is updated here
-    xyz_data tmp;
-    tmp = getACCL_XYZ_I2C(OUT_X_L_XL);
+    acc_global_data = getACCL_XYZ_I2C(OUT_X_L_XL);
 
     // converts uint16_t to binary representation
-    converter(tmp.x_data, 'x');
-    converter(tmp.y_data, 'y');
-    converter(tmp.z_data, 'z');
+    converter(acc_global_data.x_data, 'x');
+    converter(acc_global_data.y_data, 'y');
+    converter(acc_global_data.z_data, 'z');
 }
 
 // checks if the cyclist is turning and then turn on and of indicators
-void drawArrows()
-{
-    clearScreen();
-    if (yRot > leftRot)
-    {
-        addRightAutomaticArrow();
-    }
-    else if (yRot <= leftRot)
-    {
-        addLeftAutomaticArrow();
-    }
-    else if ((leftRot < yRot) && (yRot < rightRot))
-    {
-        removeRightManualArrow();
-        removeLeftManualArrow();
-    }
+// void drawArrows()
+// {
+//     clearScreen();
+//     if (yRot > leftRot)
+//     {
+//         addRightAutomaticArrow();
+//     }
+//     else if (yRot <= leftRot)
+//     {
+//         addLeftAutomaticArrow();
+//     }
+//     else if ((leftRot < yRot) && (yRot < rightRot))
+//     {
+//         removeRightManualArrow();
+//         removeLeftManualArrow();
+//     }
 
-    update_screen();
+//     update_screen();
+// }
+void scaleToFloat()
+{
+    // calculating how many g's
+    xRot = ((acc_global_data.x_data / 32767) * 16);
+    yRot = ((acc_global_data.y_data / 32767) * 16);
+    zRot = ((acc_global_data.z_data / 32767) * 16);
 }
 
 int main(void)
@@ -1151,8 +1243,11 @@ int main(void)
         delay_I2C();
         // read values from accelerometer
         readI2C();
-        // convert to gs
-        binaryToFloat(x, y, z);
+        // convert to gs m/s2
+        // binaryToFloat1(x, y, z);
+        scaleToFloat();
+        // below uses global variable acc_global_data (as read directly from LSM9)
+        // uint16toGfloat();
         // screen
         doScreenStuff();
     }

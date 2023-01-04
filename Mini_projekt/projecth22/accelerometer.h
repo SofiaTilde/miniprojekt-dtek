@@ -71,10 +71,17 @@ typedef struct gyro
     volatile uint16_t z_gyro_data;
 } gyro_data_xyz;
 
+typedef struct accel
+{
+    volatile int16_t x_data;
+    volatile int16_t y_data;
+    volatile int16_t z_data;
+} accel_data;
+
 // function defs
 void initiate_spi();
 void I2C_setup();
-xyz_data getACCL_XYZ_I2C();
+accel_data getACCL_XYZ_I2C();
 gyro_data_xyz getGYRO_XYZ_I2C();
 void delay_I2C();
 void ACCEL_config_I2C();

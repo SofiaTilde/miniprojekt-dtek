@@ -9,7 +9,7 @@
 
 /* Global variables */
 // declare array to hold the high and low 8 bits (total 16 bits) for X, Y and Z.
-uint8_t accel_data[6];
+uint8_t accel[6];
 uint8_t gyro_data[6];
 // variables to hold the full X, Y and Z results.
 uint16_t x_data;
@@ -151,7 +151,7 @@ void stop_I2C()
 }
 
 // get acceleration data from peripheral
-xyz_data getACCL_XYZ_I2C(int adress)
+accel_data getACCL_XYZ_I2C(int adress)
 {
 
     // send start until address and write bit to peripheral is acknowledged
@@ -176,12 +176,12 @@ xyz_data getACCL_XYZ_I2C(int adress)
     int j;
     for (j = 0; j < 5; j++)
     {
-        accel_data[j] = recv_I2C(); // grab 8 bits of data at a time
-        ACK_I2C();                  // sends master ACK to confirm more data can be sent
+        accel[j] = recv_I2C(); // grab 8 bits of data at a time
+        ACK_I2C();             // sends master ACK to confirm more data can be sent
     }
 
     // recv last 8 bits outside of loop to send Nack instead of mack after
-    accel_data[5] = recv_I2C();
+    accel[5] = recv_I2C();
 
     // send NACK
     NACK_I2C();
@@ -189,11 +189,11 @@ xyz_data getACCL_XYZ_I2C(int adress)
     // send stop
     stop_I2C();
 
-    xyz_data current;
+    accel_data current;
     // formatting high and low bits for each value to one complete X, Y and Z result
-    current.x_data = (accel_data[1] << 8) | accel_data[0];
-    current.y_data = (accel_data[3] << 8) | accel_data[2];
-    current.z_data = (accel_data[5] << 8) | accel_data[4];
+    current.x_data = (accel[1] << 8) | accel[0];
+    current.y_data = (accel[3] << 8) | accel[2];
+    current.z_data = (accel[5] << 8) | accel[4];
 
     return current;
 }
